@@ -1,0 +1,2613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
+  <meta name="theme-color" content="#050510" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="ARISE" />
+  <link rel="manifest" href="manifest.json" />
+  <title>ARISE — Solo Leveling System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #050510;
+      --surface: #0a0a1a;
+      --surface2: #0f0f25;
+      --border: rgba(100, 120, 255, 0.15);
+      --blue: #4466ff;
+      --blue-glow: rgba(68, 102, 255, 0.4);
+      --cyan: #00e5ff;
+      --cyan-glow: rgba(0, 229, 255, 0.3);
+      --gold: #ffd700;
+      --gold-glow: rgba(255, 215, 0, 0.4);
+      --red: #ff3366;
+      --green: #00ff88;
+      --purple: #aa44ff;
+      --text: #c8d0ff;
+      --text-dim: #5060aa;
+      --rank-e: #888;
+      --rank-d: #55cc55;
+      --rank-c: #5599ff;
+      --rank-b: #aa44ff;
+      --rank-a: #ff9900;
+      --rank-s: #ffd700;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Rajdhani', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Animated background grid */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(68,102,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(68,102,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(ellipse at 60% 20%, rgba(68,102,255,0.06) 0%, transparent 50%),
+                  radial-gradient(ellipse at 20% 80%, rgba(0,229,255,0.04) 0%, transparent 40%);
+      pointer-events: none;
+      z-index: 0;
+      animation: breathe 8s ease-in-out infinite alternate;
+    }
+
+    @keyframes breathe {
+      from { opacity: 0.5; transform: scale(1); }
+      to { opacity: 1; transform: scale(1.05); }
+    }
+
+    #app {
+      position: relative;
+      z-index: 1;
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── HEADER ─────────────────────────────────── */
+    .header {
+      padding: 20px 20px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-family: 'Orbitron', monospace;
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 4px;
+      background: linear-gradient(135deg, var(--cyan), var(--blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: none;
+      filter: drop-shadow(0 0 12px var(--cyan-glow));
+    }
+
+    .system-status {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      color: var(--green);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse-dot 2s infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; box-shadow: 0 0 6px var(--green); }
+      50% { opacity: 0.4; box-shadow: none; }
+    }
+
+    /* ── PLAYER CARD ─────────────────────────────── */
+    .player-card {
+      margin: 16px 20px;
+      background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .player-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--cyan), var(--blue), transparent);
+      animation: scan-line 3s linear infinite;
+    }
+
+    @keyframes scan-line {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    .player-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .rank-badge {
+      width: 56px; height: 56px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Orbitron', monospace;
+      font-size: 24px;
+      font-weight: 900;
+      border: 2px solid;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .rank-badge.rank-e { border-color: var(--rank-e); color: var(--rank-e); background: rgba(136,136,136,0.1); }
+    .rank-badge.rank-d { border-color: var(--rank-d); color: var(--rank-d); background: rgba(85,204,85,0.1); }
+    .rank-badge.rank-c { border-color: var(--rank-c); color: var(--rank-c); background: rgba(85,153,255,0.1); }
+    .rank-badge.rank-b { border-color: var(--rank-b); color: var(--rank-b); background: rgba(170,68,255,0.1); }
+    .rank-badge.rank-a { border-color: var(--rank-a); color: var(--rank-a); background: rgba(255,153,0,0.1); }
+    .rank-badge.rank-s { border-color: var(--rank-s); color: var(--rank-s); background: rgba(255,215,0,0.1); box-shadow: 0 0 20px var(--gold-glow); }
+
+    .player-info { flex: 1; }
+
+    .player-name {
+      font-family: 'Orbitron', monospace;
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+
+    .player-title {
+      font-size: 12px;
+      color: var(--cyan);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .level-info {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
+    .level-info span { color: var(--text); }
+
+    /* XP Bar */
+    .xp-section { margin-bottom: 14px; }
+
+    .xp-label {
+      display: flex;
+      justify-content: space-between;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+    }
+
+    .xp-bar {
+      height: 6px;
+      background: rgba(68,102,255,0.1);
+      border-radius: 3px;
+      overflow: hidden;
+      border: 1px solid rgba(68,102,255,0.2);
+    }
+
+    .xp-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--blue), var(--cyan));
+      border-radius: 3px;
+      transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    .xp-fill::after {
+      content: '';
+      position: absolute;
+      right: 0; top: 0; bottom: 0;
+      width: 20px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4));
+      border-radius: 3px;
+    }
+
+    /* Stats row */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .stat-item {
+      background: rgba(68,102,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 4px;
+      text-align: center;
+    }
+
+    .stat-icon { font-size: 16px; margin-bottom: 2px; }
+
+    .stat-value {
+      font-family: 'Orbitron', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .stat-label {
+      font-size: 9px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── ALERT BANNER ───────────────────────────── */
+    .ai-alert {
+      margin: 0 20px 16px;
+      background: linear-gradient(135deg, rgba(0,229,255,0.05), rgba(68,102,255,0.05));
+      border: 1px solid rgba(0,229,255,0.25);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      animation: alert-appear 0.5s ease-out;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+
+    .ai-alert:hover { border-color: var(--cyan); }
+
+    @keyframes alert-appear {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .alert-icon {
+      font-size: 22px;
+      flex-shrink: 0;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+
+    .alert-content { flex: 1; }
+
+    .alert-type {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px;
+      color: var(--cyan);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 3px;
+    }
+
+    .alert-text {
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.4;
+    }
+
+    .alert-dismiss {
+      font-size: 10px;
+      color: var(--text-dim);
+      flex-shrink: 0;
+      align-self: center;
+    }
+
+    /* ── SECTION LABEL ──────────────────────────── */
+    .section-label {
+      padding: 0 20px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-label span {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .section-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--border), transparent);
+    }
+
+    /* ── QUEST CARDS ────────────────────────────── */
+    .quests-scroll {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 0 20px;
+      margin-bottom: 20px;
+    }
+
+    .quest-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .quest-card:hover, .quest-card:active { 
+      border-color: rgba(68,102,255,0.4);
+      transform: translateX(2px);
+      background: var(--surface2);
+    }
+
+    .quest-card.completed {
+      opacity: 0.5;
+      border-color: rgba(0,255,136,0.2);
+    }
+
+    .quest-card.completed::after {
+      content: '✓';
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--green);
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .quest-card.boss {
+      border-color: rgba(255,51,102,0.3);
+      background: linear-gradient(135deg, rgba(255,51,102,0.05), var(--surface));
+    }
+
+    .quest-card.boss::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(255,51,102,0.05) 0%, transparent 100%);
+    }
+
+    .quest-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .quest-icon.fitness { background: rgba(255,51,102,0.1); border: 1px solid rgba(255,51,102,0.2); }
+    .quest-icon.study { background: rgba(68,102,255,0.1); border: 1px solid rgba(68,102,255,0.2); }
+    .quest-icon.work { background: rgba(0,229,255,0.1); border: 1px solid rgba(0,229,255,0.2); }
+    .quest-icon.habit { background: rgba(170,68,255,0.1); border: 1px solid rgba(170,68,255,0.2); }
+
+    .quest-info { flex: 1 }
+
+    .quest-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 3px;
+    }
+
+    .quest-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .quest-xp {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      color: var(--cyan);
+    }
+
+    .quest-diff {
+      font-size: 9px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 700;
+    }
+
+    .diff-easy { background: rgba(0,255,136,0.1); color: var(--green); }
+    .diff-medium { background: rgba(255,165,0,0.1); color: #ffa500; }
+    .diff-hard { background: rgba(255,51,102,0.1); color: var(--red); }
+    .diff-boss { background: rgba(255,51,102,0.2); color: var(--red); border: 1px solid rgba(255,51,102,0.4); }
+
+    .quest-streak {
+      font-size: 10px;
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    /* ── PILLAR HEADERS ─────────────────────────── */
+    .pillar-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 4px 8px;
+      margin-top: 4px;
+    }
+
+    .pillar-icon { font-size: 20px; flex-shrink: 0; }
+
+    .pillar-name {
+      font-family: 'Orbitron', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 1px;
+    }
+
+    .pillar-desc {
+      font-size: 10px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .pillar-count {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    .quest-desc-small {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-bottom: 4px;
+      line-height: 1.3;
+    }
+
+    .quest-check {
+      color: var(--green);
+      font-size: 20px;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-left: 4px;
+    }
+
+    /* ── PILLAR HEADERS ─────────────────────────── */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      padding: 0 20px;
+      margin-bottom: 20px;
+    }
+
+    .skill-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .skill-card:hover { border-color: rgba(68,102,255,0.4); }
+
+    .skill-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .skill-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .skill-level {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      color: var(--cyan);
+    }
+
+    .skill-bar {
+      height: 4px;
+      background: rgba(68,102,255,0.1);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 6px;
+    }
+
+    .skill-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 1s ease;
+    }
+
+    .skill-fill.fitness { background: linear-gradient(90deg, var(--red), #ff6699); }
+    .skill-fill.study { background: linear-gradient(90deg, var(--blue), var(--cyan)); }
+    .skill-fill.work { background: linear-gradient(90deg, var(--cyan), var(--green)); }
+    .skill-fill.habit { background: linear-gradient(90deg, var(--purple), #cc88ff); }
+
+    .skill-xp {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px;
+      color: var(--text-dim);
+    }
+
+    /* ── NOTIFICATION PANEL ─────────────────────── */
+    .notif-panel {
+      margin: 0 20px 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .notif-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .notif-title {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .notif-count {
+      background: var(--blue);
+      color: #fff;
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 10px;
+      font-family: 'Share Tech Mono', monospace;
+    }
+
+    .notif-list { }
+
+    .notif-item {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(68,102,255,0.05);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      animation: slide-in 0.3s ease-out both;
+    }
+
+    @keyframes slide-in {
+      from { opacity: 0; transform: translateX(10px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .notif-item:last-child { border-bottom: none; }
+
+    .notif-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+
+    .notif-msg {
+      font-size: 12px;
+      color: var(--text);
+      line-height: 1.4;
+      flex: 1;
+    }
+
+    .notif-time {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px;
+      color: var(--text-dim);
+      flex-shrink: 0;
+    }
+
+    /* ── TABS ───────────────────────────────────── */
+    .tab-bar {
+      position: fixed;
+      bottom: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      background: rgba(5,5,16,0.95);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      padding-bottom: env(safe-area-inset-bottom);
+      z-index: 100;
+    }
+
+    .tab-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 8px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      gap: 4px;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .tab-btn.active::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 20%; right: 20%;
+      height: 2px;
+      background: linear-gradient(90deg, var(--blue), var(--cyan));
+      border-radius: 0 0 2px 2px;
+    }
+
+    .tab-icon { font-size: 20px; }
+
+    .tab-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .tab-btn.active .tab-label { color: var(--cyan); }
+    .tab-btn:not(.active) .tab-label { color: var(--text-dim); }
+
+    .content-area {
+      flex: 1;
+      padding-bottom: 80px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Tab panels */
+    .tab-panel { display: none; padding-top: 16px; }
+    .tab-panel.active { display: block; }
+
+    /* ── LOG IN SCREEN ──────────────────────────── */
+    .setup-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 30px;
+      text-align: center;
+    }
+
+    .setup-logo {
+      font-family: 'Orbitron', monospace;
+      font-size: 42px;
+      font-weight: 900;
+      letter-spacing: 8px;
+      background: linear-gradient(135deg, var(--cyan), var(--blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 30px var(--cyan-glow));
+      margin-bottom: 8px;
+      animation: flicker 4s ease-in-out infinite;
+    }
+
+    @keyframes flicker {
+      0%, 95%, 100% { opacity: 1; }
+      97% { opacity: 0.7; }
+      98% { opacity: 1; }
+      99% { opacity: 0.5; }
+    }
+
+    .setup-subtitle {
+      font-size: 13px;
+      color: var(--text-dim);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 48px;
+    }
+
+    .setup-form { width: 100%; max-width: 320px; }
+
+    .setup-input {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      color: #fff;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 12px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .setup-input:focus { border-color: var(--cyan); }
+    .setup-input::placeholder { color: var(--text-dim); }
+
+    .setup-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      text-align: left;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .webhook-hint {
+      font-size: 10px;
+      color: var(--text-dim);
+      text-align: left;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .webhook-hint code {
+      color: var(--cyan);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px;
+    }
+
+    .setup-btn {
+      width: 100%;
+      background: linear-gradient(135deg, var(--blue), var(--cyan));
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 16px;
+      font-family: 'Orbitron', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 20px var(--blue-glow);
+    }
+
+    .setup-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px var(--blue-glow); }
+    .setup-btn:active { transform: translateY(0); }
+
+    /* ── LEVEL UP OVERLAY ───────────────────────── */
+    .levelup-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      background: rgba(5,5,16,0.95);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s;
+    }
+
+    .levelup-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .levelup-ring {
+      width: 140px; height: 140px;
+      border-radius: 50%;
+      border: 3px solid var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+      position: relative;
+      animation: ring-pulse 1s ease-out;
+      box-shadow: 0 0 40px var(--gold-glow), inset 0 0 40px rgba(255,215,0,0.05);
+    }
+
+    @keyframes ring-pulse {
+      0% { transform: scale(0.5); opacity: 0; }
+      60% { transform: scale(1.1); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .levelup-num {
+      font-family: 'Orbitron', monospace;
+      font-size: 52px;
+      font-weight: 900;
+      color: var(--gold);
+      filter: drop-shadow(0 0 20px var(--gold-glow));
+    }
+
+    .levelup-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 11px;
+      letter-spacing: 5px;
+      color: var(--text-dim);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+
+    .levelup-text {
+      font-size: 22px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .levelup-msg {
+      font-size: 14px;
+      color: var(--text-dim);
+      margin-bottom: 32px;
+      line-height: 1.5;
+    }
+
+    .levelup-close {
+      background: var(--surface2);
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 2px;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+
+    /* ── SETTINGS PANEL ─────────────────────────── */
+    .settings-section {
+      padding: 0 20px;
+      margin-bottom: 20px;
+    }
+
+    .setting-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .setting-info { flex: 1; }
+
+    .setting-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 2px;
+    }
+
+    .setting-desc {
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
+    .toggle {
+      width: 44px; height: 24px;
+      background: rgba(68,102,255,0.2);
+      border-radius: 12px;
+      position: relative;
+      cursor: pointer;
+      transition: background 0.2s;
+      border: 1px solid var(--border);
+      flex-shrink: 0;
+      margin-left: 12px;
+    }
+
+    .toggle.on { background: linear-gradient(90deg, var(--blue), var(--cyan)); }
+
+    .toggle::after {
+      content: '';
+      position: absolute;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: #fff;
+      top: 2px; left: 2px;
+      transition: transform 0.2s;
+    }
+
+    .toggle.on::after { transform: translateX(20px); }
+
+    .webhook-display {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 8px;
+    }
+
+    .webhook-url {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      color: var(--cyan);
+      word-break: break-all;
+      line-height: 1.5;
+    }
+
+    .webhook-label {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+    }
+
+    .copy-btn {
+      background: rgba(68,102,255,0.1);
+      border: 1px solid var(--border);
+      color: var(--blue);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 8px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: all 0.2s;
+    }
+
+    .copy-btn:hover { border-color: var(--blue); }
+
+    /* ── ANALYTICS ──────────────────────────────── */
+    .streak-grid {
+      padding: 0 20px;
+      margin-bottom: 20px;
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+    }
+
+    .streak-day {
+      aspect-ratio: 1;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      font-family: 'Share Tech Mono', monospace;
+      color: var(--text-dim);
+    }
+
+    .streak-day.done { background: rgba(0,255,136,0.2); color: var(--green); border: 1px solid rgba(0,255,136,0.3); }
+    .streak-day.partial { background: rgba(255,165,0,0.15); color: #ffa500; border: 1px solid rgba(255,165,0,0.2); }
+    .streak-day.empty { background: rgba(68,102,255,0.05); border: 1px solid var(--border); }
+    .streak-day.today { border: 1px solid var(--cyan); }
+
+    .analytics-row {
+      padding: 0 20px;
+      margin-bottom: 20px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .analytic-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .analytic-val {
+      font-family: 'Orbitron', monospace;
+      font-size: 22px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+
+    .analytic-label {
+      font-size: 10px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Input complete quest */
+    .complete-btn {
+      background: linear-gradient(135deg, rgba(0,255,136,0.1), rgba(68,102,255,0.1));
+      border: 1px solid rgba(0,255,136,0.2);
+      color: var(--green);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: all 0.2s;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .complete-btn:hover { border-color: var(--green); background: rgba(0,255,136,0.15); }
+
+    /* Particles */
+    .particle {
+      position: fixed;
+      pointer-events: none;
+      font-size: 20px;
+      animation: particle-rise 1.5s ease-out forwards;
+      z-index: 400;
+    }
+
+    @keyframes particle-rise {
+      from { opacity: 1; transform: translateY(0) scale(1); }
+      to { opacity: 0; transform: translateY(-100px) scale(0.5); }
+    }
+
+    .xp-popup {
+      position: fixed;
+      pointer-events: none;
+      font-family: 'Orbitron', monospace;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--gold);
+      z-index: 400;
+      animation: xp-rise 1.2s ease-out forwards;
+      text-shadow: 0 0 15px var(--gold-glow);
+    }
+
+    @keyframes xp-rise {
+      from { opacity: 1; transform: translateY(0) scale(1); }
+      to { opacity: 0; transform: translateY(-80px) scale(1.3); }
+    }
+
+    .pulse-anim {
+      animation: card-pulse 0.3s ease-out;
+    }
+
+    @keyframes card-pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(0.98); }
+      100% { transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Setup Screen -->
+<div class="setup-screen" id="setupScreen">
+  <div class="setup-logo">ARISE</div>
+  <div class="setup-subtitle">System Awakening Protocol</div>
+  <div class="setup-form">
+    <label class="setup-label">Hunter Name</label>
+    <input class="setup-input" id="nameInput" type="text" placeholder="Enter your name..." maxlength="20" />
+    
+    <label class="setup-label">n8n Webhook URL <span style="color:var(--text-dim);font-size:9px">(optional)</span></label>
+    <input class="setup-input" id="webhookInput" type="url" placeholder="https://your-n8n.com/webhook/..." />
+    <div class="webhook-hint">
+      Connect your n8n instance to receive AI-triggered quests. Leave blank to use local AI mode.<br>
+      Set up the <code>ARISE Trigger</code> workflow — instructions in Settings.
+    </div>
+    
+    <button class="setup-btn" onclick="initSystem()">INITIALIZE SYSTEM</button>
+  </div>
+</div>
+
+<!-- Level Up Overlay -->
+<div class="levelup-overlay" id="levelupOverlay">
+  <div class="levelup-title">Level Up</div>
+  <div class="levelup-ring">
+    <div class="levelup-num" id="levelupNum">12</div>
+  </div>
+  <div class="levelup-text" id="levelupText">You have grown stronger.</div>
+  <div class="levelup-msg" id="levelupMsg">New abilities unlocked. The system acknowledges your growth.</div>
+  <button class="levelup-close" onclick="closeLevelUp()">ACKNOWLEDGE</button>
+</div>
+
+<!-- Main App -->
+<div id="app">
+  <div class="header">
+    <div class="logo">ARISE</div>
+    <div class="system-status">
+      <div class="status-dot"></div>
+      <span id="systemStatusText">SYSTEM ACTIVE</span>
+    </div>
+  </div>
+
+  <div class="content-area" id="contentArea">
+    <!-- Quests Tab -->
+    <div class="tab-panel active" id="panel-quests">
+      <!-- AI Alert -->
+      <div class="ai-alert" id="aiAlert" onclick="dismissAlert()">
+        <div class="alert-icon" id="alertIcon">⚡</div>
+        <div class="alert-content">
+          <div class="alert-type" id="alertType">AI TRIGGER — SYSTEM MESSAGE</div>
+          <div class="alert-text" id="alertText">The system has detected your presence. Begin your daily quests, Hunter.</div>
+        </div>
+        <div class="alert-dismiss">✕</div>
+      </div>
+
+      <div class="section-label">
+        <span>Daily Quests</span>
+        <div class="section-line"></div>
+        <span id="questProgress">0/5</span>
+      </div>
+
+      <div class="quests-scroll" id="questList"></div>
+
+      <div class="section-label">
+        <span>Active Boss</span>
+        <div class="section-line"></div>
+      </div>
+      <div style="padding:0 20px; margin-bottom:20px">
+        <div class="quest-card boss" id="bossCard" onclick="attemptBoss()">
+          <div class="quest-icon fitness">🐉</div>
+          <div class="quest-info">
+            <div class="quest-name" id="bossName">Weekly Boss — Iron Discipline</div>
+            <div class="quest-meta">
+              <span class="quest-xp" id="bossXP">+500 XP</span>
+              <span class="quest-diff diff-boss">BOSS</span>
+            </div>
+          </div>
+          <button class="complete-btn" onclick="event.stopPropagation(); completeBoss()">RAID</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Skills Tab -->
+    <div class="tab-panel" id="panel-skills">
+      <div class="section-label">
+        <span>Skill Trees</span>
+        <div class="section-line"></div>
+      </div>
+      <div class="skills-grid" id="skillGrid"></div>
+
+      <div class="section-label">
+        <span>Recent Gains</span>
+        <div class="section-line"></div>
+      </div>
+      <div class="notif-panel">
+        <div class="notif-list" id="skillLog"></div>
+      </div>
+    </div>
+
+    <!-- Analytics Tab -->
+    <div class="tab-panel" id="panel-analytics">
+      <div class="section-label">
+        <span>This Week</span>
+        <div class="section-line"></div>
+      </div>
+      <div class="analytics-row">
+        <div class="analytic-card">
+          <div class="analytic-val" id="statTotalXP">0</div>
+          <div class="analytic-label">Total XP</div>
+        </div>
+        <div class="analytic-card">
+          <div class="analytic-val" id="statStreak">0🔥</div>
+          <div class="analytic-label">Streak</div>
+        </div>
+        <div class="analytic-card">
+          <div class="analytic-val" id="statQuests">0</div>
+          <div class="analytic-label">Quests Done</div>
+        </div>
+      </div>
+
+      <div class="section-label">
+        <span>Activity Heatmap</span>
+        <div class="section-line"></div>
+      </div>
+      <div class="streak-grid" id="heatmap"></div>
+
+      <div class="section-label">
+        <span>AI Activity Log</span>
+        <div class="section-line"></div>
+      </div>
+      <div class="notif-panel">
+        <div class="notif-header">
+          <span class="notif-title">System Log</span>
+          <span class="notif-count" id="logCount">0</span>
+        </div>
+        <div class="notif-list" id="activityLog"></div>
+      </div>
+    </div>
+
+    <!-- Settings Tab -->
+    <div class="tab-panel" id="panel-settings">
+      <div class="section-label">
+        <span>Player</span>
+        <div class="section-line"></div>
+      </div>
+      <div class="settings-section">
+        <div class="setting-item">
+          <div class="setting-info">
+            <div class="setting-name" id="settingName">Hunter</div>
+            <div class="setting-desc">Rank: <span id="settingRank">E</span> — Level <span id="settingLevel">1</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-label">
+        <span>AI Triggers</span>
+        <div class="section-line"></div>
+      </div>
+      <div class="settings-section">
+        <div class="setting-item">
+          <div class="setting-info">
+            <div class="setting-name">Daily Quest Generation</div>
+            <div class="setting-desc">AI generates quests every morning at 6AM</div>
+          </div>
+          <div class="toggle on" id="toggle-morning" onclick="toggleSetting('morning')"></div>
+        </div>
+        <div class="setting-item">
+          <div class="setting-info">
+            <div class="setting-name">Streak Warning</div>
+            <div class="setting-desc">AI warns you 2hrs before midnight if quests incomplete</div>
+          </div>
+          <div class="toggle on" id="toggle-streak" onclick="toggleSetting('streak')"></div>
+        </div>
+        <div class="setting-item">
+          <div class="setting-info">
+            <div class="setting-name">Skill Level-Up Events</div>
+            <div class="setting-desc">AI triggers ceremony when skills advance</div>
+          </div>
+          <div class="toggle on" id="toggle-skillup" onclick="toggleSetting('skillup')"></div>
+        </div>
+        <div class="setting-item">
+          <div class="setting-info">
+            <div class="setting-name">Boss Raid Alerts</div>
+            <div class="setting-desc">Weekly boss spawns on Mondays</div>
+          </div>
+          <div class="toggle on" id="toggle-boss" onclick="toggleSetting('boss')"></div>
+        </div>
+      </div>
+
+      <div class="section-label">
+        <span>n8n Integration</span>
+        <div class="section-line"></div>
+      </div>
+      <div class="settings-section">
+        <div class="webhook-display">
+          <div class="webhook-label">Your App Webhook (paste in n8n)</div>
+          <div class="webhook-url" id="appWebhookUrl">Set up webhook to see URL</div>
+          <button class="copy-btn" onclick="copyWebhook()">COPY URL</button>
+        </div>
+        <div class="webhook-display" style="margin-top:8px">
+          <div class="webhook-label">n8n Workflow Setup Instructions</div>
+          <div style="font-size:11px; color:var(--text-dim); line-height:1.6">
+            1. Import the <code style="color:var(--cyan);font-family:'Share Tech Mono',monospace">ARISE-n8n-workflow.json</code> file into n8n<br>
+            2. Set your webhook URL in the HTTP Request node<br>
+            3. Configure your schedule triggers (cron nodes)<br>
+            4. The workflow will auto-send quest updates, streak warnings, and level-up events<br><br>
+            <span style="color:var(--cyan)">Trigger types your n8n should POST:</span><br>
+            <code style="color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:9px">
+              { "type": "quest", "quests": [...] }<br>
+              { "type": "streak_warning", "message": "..." }<br>
+              { "type": "levelup", "level": 5, "message": "..." }<br>
+              { "type": "boss", "name": "...", "xp": 500 }
+            </code>
+          </div>
+        </div>
+        <button class="copy-btn" style="width:100%;padding:12px;margin-top:8px;font-size:11px" onclick="downloadWorkflow()">
+          ↓ DOWNLOAD N8N WORKFLOW JSON
+        </button>
+        <button class="copy-btn" style="width:100%;padding:12px;margin-top:8px;font-size:11px;color:var(--red);border-color:rgba(255,51,102,0.3)" onclick="resetSystem()">
+          RESET SYSTEM
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Player Card (shown in quests/skills) -->
+  <div id="playerCardWrapper"></div>
+
+  <!-- Tab Bar -->
+  <nav class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('quests', this)">
+      <span class="tab-icon">⚔️</span>
+      <span class="tab-label">Quests</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('skills', this)">
+      <span class="tab-icon">🧠</span>
+      <span class="tab-label">Skills</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('analytics', this)">
+      <span class="tab-icon">📊</span>
+      <span class="tab-label">Analytics</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('settings', this)">
+      <span class="tab-icon">⚙️</span>
+      <span class="tab-label">Settings</span>
+    </button>
+  </nav>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+//  SOLO LEVELING SYSTEM — STATE ENGINE
+// ═══════════════════════════════════════════
+
+const RANKS = ['E', 'D', 'C', 'B', 'A', 'S'];
+const RANK_THRESHOLDS = [0, 10, 25, 50, 80, 120]; // levels for each rank
+const XP_PER_LEVEL = [100, 150, 200, 280, 380, 500, 650, 800, 1000, 1200];
+
+// ── AARYA'S FIXED DAILY PROTOCOL ──────────────────
+// These are the EXACT same quests every day. No randomization.
+// Organized into 4 pillars.
+
+const DAILY_PROTOCOL = [
+  // ── PILLAR 1: THE VESSEL ──────────────────────────
+  {
+    id: 0,
+    pillar: 'vessel',
+    name: 'Hypertrophy Session',
+    desc: 'Gym — V-Taper/Size training',
+    icon: '🏋️',
+    xp: 120,
+    diff: 'hard',
+    area: 'fitness',
+    detail: 'Full gym session focused on muscle hypertrophy. V-taper movements: lat pulldowns, rows, shoulder press, chest. Log sets & reps.'
+  },
+  {
+    id: 1,
+    pillar: 'vessel',
+    name: 'Agility/Speed Session',
+    desc: 'Sports drills or sprints',
+    icon: '⚡',
+    xp: 100,
+    diff: 'hard',
+    area: 'fitness',
+    detail: 'Sprint intervals, agility ladder, sport drills, or court session. Goal: explosiveness and athletic movement.'
+  },
+  {
+    id: 2,
+    pillar: 'vessel',
+    name: 'Global Jain Bulk — 2800+ Cal',
+    desc: 'High-protein, non-Indian Jain meals',
+    icon: '🥗',
+    xp: 90,
+    diff: 'medium',
+    area: 'fitness',
+    detail: 'Power Oats, Burrito Bowls, Grilled Paneer. ZERO roti/sabji, ZERO onion/garlic. Hit 2800+ calories of clean fuel.'
+  },
+  {
+    id: 3,
+    pillar: 'vessel',
+    name: 'Hydration — 4 Liters',
+    desc: 'Drink 4L of water',
+    icon: '💧',
+    xp: 40,
+    diff: 'easy',
+    area: 'fitness',
+    detail: 'Track 4 full liters. Spread across the day. Essential for muscle recovery and skin clarity.'
+  },
+  {
+    id: 4,
+    pillar: 'vessel',
+    name: 'Warlord Hygiene Protocol',
+    desc: 'Cold shower + skincare + deodorant',
+    icon: '🚿',
+    xp: 50,
+    diff: 'easy',
+    area: 'fitness',
+    detail: 'Morning cold shower (minimum 2 min cold). Post-sport shower after training. Cleanser → Moisturizer → SPF. Deodorant daily.'
+  },
+
+  // ── PILLAR 2: THE EMPIRE ──────────────────────────
+  {
+    id: 5,
+    pillar: 'empire',
+    name: 'Relentless Outreach',
+    desc: '5 Cold DMs to Dental Clinics',
+    icon: '📨',
+    xp: 100,
+    diff: 'medium',
+    area: 'work',
+    detail: 'Send minimum 5 cold DMs to dental clinics about AI automation. OR complete 1 hour of pure deep work on Arkeene AI. No half-measures.'
+  },
+  {
+    id: 6,
+    pillar: 'empire',
+    name: 'Industry Knowledge',
+    desc: 'Watch 1 Sales or Agency video',
+    icon: '🎯',
+    xp: 40,
+    diff: 'easy',
+    area: 'work',
+    detail: 'One focused video on sales, agency growth, or AI business. Take one actionable note from it. Apply it this week.'
+  },
+
+  // ── PILLAR 3: THE INTELLECT ───────────────────────
+  {
+    id: 7,
+    pillar: 'intellect',
+    name: 'Chess Puzzles — 3x',
+    desc: 'Solve exactly 3 chess puzzles',
+    icon: '♟️',
+    xp: 50,
+    diff: 'easy',
+    area: 'study',
+    detail: 'Solve 3 puzzles on Chess.com or Lichess. No blundering. Focus on pattern recognition and tactical thinking.'
+  },
+  {
+    id: 8,
+    pillar: 'intellect',
+    name: 'AI Market Intelligence',
+    desc: 'Read AI Automation news — 15 min',
+    icon: '🤖',
+    xp: 40,
+    diff: 'easy',
+    area: 'study',
+    detail: 'Stay ahead of the curve. 15 minutes of AI/automation news — X, newsletters, YouTube. Note one insight relevant to Arkeene AI.'
+  },
+
+  // ── PILLAR 4: THE AURA ────────────────────────────
+  {
+    id: 9,
+    pillar: 'aura',
+    name: 'Stillness Meditation',
+    desc: '10 min — motionless, no thoughts',
+    icon: '🧘',
+    xp: 60,
+    diff: 'medium',
+    area: 'habit',
+    detail: 'Sit completely still for 10 minutes. No fidgeting. No phone. The goal is zero movement and zero mental chatter. Patience as a weapon.'
+  },
+  {
+    id: 10,
+    pillar: 'aura',
+    name: 'Command Presence',
+    desc: 'Upright posture in all public spaces',
+    icon: '👑',
+    xp: 30,
+    diff: 'easy',
+    area: 'habit',
+    detail: 'Shoulders back, chin up, chest open — especially in college. Posture is the silent signal of status. Carry yourself like a Monarch.'
+  },
+  {
+    id: 11,
+    pillar: 'aura',
+    name: 'Absolute Digital Detox',
+    desc: 'Zero Instagram Reels or YouTube Shorts',
+    icon: '📵',
+    xp: 70,
+    diff: 'hard',
+    area: 'habit',
+    detail: 'No Reels. No Shorts. No cheap dopamine. Your mind is the weapon — protect it from noise. Use phone only for work, learning, or communication.'
+  },
+  {
+    id: 12,
+    pillar: 'aura',
+    name: 'Book of Shadows — Nightly Log',
+    desc: 'Journal wins/losses + set tomorrow\'s intent',
+    icon: '📖',
+    xp: 60,
+    diff: 'medium',
+    area: 'habit',
+    detail: 'Before sleeping: Log today\'s wins and losses honestly. Rate the day 1-10. Write 3 priorities for tomorrow. Close the loop on today.'
+  },
+];
+
+// Pillar metadata
+const PILLARS = {
+  vessel:    { name: 'The Vessel',    icon: '⚔️', color: 'var(--red)',    desc: 'Body & Fuel' },
+  empire:    { name: 'The Empire',    icon: '💼', color: 'var(--cyan)',   desc: 'Wealth Generation' },
+  intellect: { name: 'The Intellect', icon: '🧠', color: 'var(--blue)',   desc: 'Mind Sharpness' },
+  aura:      { name: 'The Aura',      icon: '👑', color: 'var(--gold)',   desc: 'Discipline & Command' },
+};
+
+const BOSSES = [
+  { name: 'The Sovereign Week', xp: 1000, desc: 'Complete ALL 13 quests for 7 days straight. No exceptions.', icon: '👑' },
+  { name: 'Arkeene Empire Launch', xp: 800, desc: 'Close your first paying dental clinic client this week.', icon: '💼' },
+  { name: 'Iron Vessel Challenge', xp: 700, desc: 'Zero missed gym sessions + 2800 cal hit every day this week.', icon: '🏋️' },
+  { name: 'The Monarch Protocol', xp: 600, desc: 'Full digital detox + meditation + journal — 5 days unbroken.', icon: '🧘' },
+  { name: 'Shadow Army Outreach', xp: 750, desc: 'Send 35 cold DMs this week (5/day minimum). Track replies.', icon: '📨' },
+];
+
+const AI_MESSAGES = {
+  morning: [
+    "Rise, Aarya. The System has assigned your 13 daily trials. The Vessel demands training. The Empire demands outreach. Begin.",
+    "A new day. Your competitors are already working. 13 quests await. The Sovereign does not sleep in.",
+    "System online. Protocol loaded. 4 pillars to conquer today — Vessel, Empire, Intellect, Aura. No excuses.",
+    "The weak check Instagram. The Hunter checks his quests. Today's protocol is locked and loaded, Aarya.",
+    "Dawn acknowledged. Arkeene AI does not build itself. Hit the gym, send the DMs, log the journal. Go.",
+  ],
+  streak_warning: [
+    "⚠️ Hunter Aarya — your streak is in danger. 2 hours until midnight. Incomplete quests detected. Move.",
+    "The System has detected incomplete trials. Your {days}-day streak will break at midnight. Finish what you started.",
+    "Night approaches. The Book of Shadows has not been written. The Empire has not been built today. Act now.",
+    "Final warning, Aarya. The Monarch does not leave quests unfinished. Check your protocol. Complete it.",
+  ],
+  skill_up: [
+    "Your {skill} has advanced to Level {level}. The System recognizes your growth. Keep pushing.",
+    "SKILL ADVANCEMENT — {skill} Lv.{level} reached. Aarya is becoming stronger. The Empire grows.",
+    "{skill} skill upgraded to Level {level}. The Sovereign's power increases. New heights await.",
+  ],
+  levelup: [
+    "Power surges. You have ascended to Level {level}. The System acknowledges your discipline, Aarya.",
+    "Level {level} achieved. Arkeene AI is being built by a stronger version of you than yesterday.",
+    "The Sovereign grows. Level {level} unlocked. Keep building the Empire, Hunter.",
+  ],
+  boss_spawn: [
+    "A new gate has opened. This week's Boss Raid is active. Face it before Sunday ends, Aarya.",
+    "BOSS ALERT — A challenge worthy of a Monarch has appeared. Accept the raid before the gate closes.",
+  ],
+  idle: [
+    "Aarya — 2 days of inactivity detected. The Sovereign does not rest this long. The Empire stalls. Return.",
+    "The System is disappointed. Dental clients will not come to the idle. Your quests are waiting. Wake up.",
+    "Idleness is the enemy of ascension. Your competitors are outreaching while you sleep. Rise, Hunter.",
+  ]
+};
+
+let state = {};
+
+function loadState() {
+  const saved = localStorage.getItem('arise_state');
+  if (saved) {
+    state = JSON.parse(saved);
+    return true;
+  }
+  return false;
+}
+
+function saveState() {
+  localStorage.setItem('arise_state', JSON.stringify(state));
+}
+
+function initDefaultState(name, webhook) {
+  const today = getTodayKey();
+  state = {
+    name,
+    webhook: webhook || '',
+    level: 1,
+    xp: 0,
+    xpToNext: XP_PER_LEVEL[0],
+    rank: 'E',
+    totalXP: 0,
+    questsDone: 0,
+    streak: 0,
+    lastActiveDay: null,
+    skills: {
+      fitness: { level: 1, xp: 0, xpToNext: 200 },
+      study: { level: 1, xp: 0, xpToNext: 200 },
+      work: { level: 1, xp: 0, xpToNext: 200 },
+      habit: { level: 1, xp: 0, xpToNext: 200 },
+    },
+    dailyQuests: generateDailyQuests(),
+    lastQuestDate: today,
+    bossActive: true,
+    bossIndex: 0,
+    bossCompleted: false,
+    activityLog: [],
+    heatmap: {},
+    settings: {
+      morning: true,
+      streak: true,
+      skillup: true,
+      boss: true,
+    }
+  };
+}
+
+function getTodayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+}
+
+function generateDailyQuests() {
+  // Always the same 13 quests — Aarya's exact protocol
+  return DAILY_PROTOCOL.map(q => ({ ...q, completed: false }));
+}
+
+function getRank(level) {
+  for (let i = RANK_THRESHOLDS.length - 1; i >= 0; i--) {
+    if (level >= RANK_THRESHOLDS[i]) return RANKS[i];
+  }
+  return 'E';
+}
+
+function getXPToNext(level) {
+  return XP_PER_LEVEL[Math.min(level - 1, XP_PER_LEVEL.length - 1)];
+}
+
+// ═══════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════
+
+function initSystem() {
+  const name = document.getElementById('nameInput').value.trim() || 'Hunter';
+  const webhook = document.getElementById('webhookInput').value.trim();
+  initDefaultState(name, webhook);
+  addLog('System initialized. Welcome, ' + name + '. Your journey begins.', 'var(--cyan)');
+  saveState();
+  document.getElementById('setupScreen').style.display = 'none';
+  renderAll();
+  startAIScheduler();
+  registerPushNotifications();
+}
+
+window.addEventListener('load', () => {
+  if (loadState()) {
+    document.getElementById('setupScreen').style.display = 'none';
+    checkDayRollover();
+    renderAll();
+    startAIScheduler();
+    registerPushNotifications();
+  }
+});
+
+function checkDayRollover() {
+  const today = getTodayKey();
+  if (state.lastQuestDate !== today) {
+    // Check streak
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yKey = `${yesterday.getFullYear()}-${yesterday.getMonth()}-${yesterday.getDate()}`;
+
+    const completedYesterday = state.heatmap[state.lastQuestDate] === 'done';
+    if (completedYesterday) {
+      state.streak = (state.streak || 0) + 1;
+    } else if (state.lastQuestDate) {
+      state.streak = 0;
+      addLog('Streak broken. The System is disappointed. Rebuild your discipline.', 'var(--red)');
+    }
+
+    state.dailyQuests = generateDailyQuests();
+    state.lastQuestDate = today;
+    saveState();
+    triggerAIMessage('morning');
+  }
+}
+
+// ═══════════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════════
+
+function renderAll() {
+  renderPlayerCard();
+  renderQuests();
+  renderSkills();
+  renderAnalytics();
+  renderSettings();
+}
+
+function renderPlayerCard() {
+  const rank = getRank(state.level);
+  const xpPct = Math.min((state.xp / state.xpToNext) * 100, 100);
+
+  // Insert player card at top of quests panel
+  const panel = document.getElementById('panel-quests');
+  let card = document.getElementById('playerCardInline');
+  if (!card) {
+    card = document.createElement('div');
+    card.id = 'playerCardInline';
+    panel.insertBefore(card, panel.firstChild);
+  }
+
+  card.innerHTML = `
+    <div class="player-card">
+      <div class="player-header">
+        <div class="rank-badge rank-${rank.toLowerCase()}">${rank}</div>
+        <div class="player-info">
+          <div class="player-name">${state.name.toUpperCase()}</div>
+          <div class="player-title">${getTitle(state.level, rank)}</div>
+          <div class="level-info">LEVEL <span>${state.level}</span> &nbsp;·&nbsp; STREAK <span>${state.streak}🔥</span></div>
+        </div>
+      </div>
+      <div class="xp-section">
+        <div class="xp-label">
+          <span>XP PROGRESS</span>
+          <span>${state.xp} / ${state.xpToNext}</span>
+        </div>
+        <div class="xp-bar">
+          <div class="xp-fill" style="width:${xpPct}%"></div>
+        </div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-item">
+          <div class="stat-icon">⚔️</div>
+          <div class="stat-value">${state.skills.fitness.level}</div>
+          <div class="stat-label">Body</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon">📚</div>
+          <div class="stat-value">${state.skills.study.level}</div>
+          <div class="stat-label">Mind</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon">💼</div>
+          <div class="stat-value">${state.skills.work.level}</div>
+          <div class="stat-label">Work</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon">🧘</div>
+          <div class="stat-value">${state.skills.habit.level}</div>
+          <div class="stat-label">Habit</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function getTitle(level, rank) {
+  const titles = {
+    E: ['Awakened Hunter', 'Gate Explorer', 'Novice Raider'],
+    D: ['Rank-D Hunter', 'Shadow Striker', 'Iron Gate Breaker'],
+    C: ['Rank-C Hunter', 'Blue Steel Warrior', 'Dungeon Clearer'],
+    B: ['Rank-B Hunter', 'Violet Chain Hunter', 'Gate Sovereign'],
+    A: ['Rank-A Hunter', 'Gold Rank Elite', 'Abyss Walker'],
+    S: ['Shadow Monarch', 'Absolute Ruler', 'The Strongest'],
+  };
+  const t = titles[rank];
+  return t[Math.min(Math.floor(level / 5), t.length - 1)];
+}
+
+function renderQuests() {
+  const list = document.getElementById('questList');
+  const completed = state.dailyQuests.filter(q => q.completed).length;
+  const total = state.dailyQuests.length;
+  document.getElementById('questProgress').textContent = `${completed}/${total}`;
+
+  // Group by pillar
+  const pillarOrder = ['vessel', 'empire', 'intellect', 'aura'];
+  let html = '';
+
+  pillarOrder.forEach(pillarKey => {
+    const p = PILLARS[pillarKey];
+    const quests = state.dailyQuests.filter(q => q.pillar === pillarKey);
+    const donePillar = quests.filter(q => q.completed).length;
+
+    html += `
+      <div class="pillar-header">
+        <div class="pillar-icon" style="color:${p.color}">${p.icon}</div>
+        <div class="pillar-info">
+          <div class="pillar-name">${p.name}</div>
+          <div class="pillar-desc">${p.desc}</div>
+        </div>
+        <div class="pillar-count" style="color:${p.color}">${donePillar}/${quests.length}</div>
+      </div>
+    `;
+
+    quests.forEach(q => {
+      html += `
+        <div class="quest-card ${q.completed ? 'completed' : ''}" id="quest-${q.id}" onclick="showQuestDetail(${q.id})">
+          <div class="quest-icon ${q.area}">${q.icon}</div>
+          <div class="quest-info">
+            <div class="quest-name">${q.name}</div>
+            <div class="quest-desc-small">${q.desc}</div>
+            <div class="quest-meta">
+              <span class="quest-xp">+${q.xp} XP</span>
+              <span class="quest-diff diff-${q.diff}">${q.diff.toUpperCase()}</span>
+            </div>
+          </div>
+          ${!q.completed
+            ? `<button class="complete-btn" onclick="event.stopPropagation();completeQuest(${q.id})">DONE</button>`
+            : `<div class="quest-check">✓</div>`
+          }
+        </div>
+      `;
+    });
+  });
+
+  list.innerHTML = html;
+
+  // Boss card
+  const boss = BOSSES[state.bossIndex % BOSSES.length];
+  document.getElementById('bossName').textContent = `${boss.icon} ${boss.name}`;
+  document.getElementById('bossXP').textContent = `+${boss.xp} XP`;
+  if (state.bossCompleted) {
+    document.getElementById('bossCard').classList.add('completed');
+  }
+}
+
+// Quest detail modal
+function showQuestDetail(id) {
+  const quest = state.dailyQuests.find(q => q.id === id);
+  if (!quest) return;
+
+  const existing = document.getElementById('questModal');
+  if (existing) existing.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'questModal';
+  modal.style.cssText = `
+    position:fixed;inset:0;z-index:250;background:rgba(5,5,16,0.92);
+    backdrop-filter:blur(10px);display:flex;align-items:flex-end;
+    animation:modal-in 0.25s ease-out;
+  `;
+
+  const pillar = PILLARS[quest.pillar];
+  const totalXP = state.dailyQuests.filter(q => q.pillar === quest.pillar && q.completed).reduce((s,q)=>s+q.xp,0);
+
+  modal.innerHTML = `
+    <style>
+      @keyframes modal-in { from { opacity:0;transform:translateY(30px) } to { opacity:1;transform:translateY(0) } }
+    </style>
+    <div style="width:100%;max-width:480px;margin:0 auto;background:var(--surface);border:1px solid var(--border);
+      border-radius:20px 20px 0 0;padding:24px 20px 40px;">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
+        <div style="font-size:36px">${quest.icon}</div>
+        <div style="flex:1">
+          <div style="font-size:17px;font-weight:700;color:#fff;margin-bottom:4px">${quest.name}</div>
+          <div style="font-size:11px;color:${pillar.color};text-transform:uppercase;letter-spacing:1px">${pillar.icon} ${pillar.name}</div>
+        </div>
+        <div onclick="document.getElementById('questModal').remove()" style="color:var(--text-dim);font-size:20px;cursor:pointer;padding:4px">✕</div>
+      </div>
+
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:16px;
+        font-size:13px;color:var(--text);line-height:1.6">
+        ${quest.detail}
+      </div>
+
+      <div style="display:flex;gap:10px;margin-bottom:20px">
+        <div style="flex:1;background:rgba(68,102,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center">
+          <div style="font-family:'Orbitron',monospace;font-size:18px;color:var(--gold);font-weight:700">+${quest.xp}</div>
+          <div style="font-size:9px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px">XP Reward</div>
+        </div>
+        <div style="flex:1;background:rgba(68,102,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center">
+          <div style="font-size:16px;font-weight:700;color:#fff">${quest.diff.toUpperCase()}</div>
+          <div style="font-size:9px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px">Difficulty</div>
+        </div>
+        <div style="flex:1;background:rgba(68,102,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center">
+          <div style="font-size:16px;font-weight:700;color:${quest.completed ? 'var(--green)' : 'var(--red)'}">
+            ${quest.completed ? 'DONE' : 'OPEN'}
+          </div>
+          <div style="font-size:9px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px">Status</div>
+        </div>
+      </div>
+
+      ${!quest.completed ? `
+        <button onclick="completeQuest(${quest.id});document.getElementById('questModal').remove()"
+          style="width:100%;background:linear-gradient(135deg,var(--blue),var(--cyan));
+          color:#fff;border:none;border-radius:10px;padding:16px;
+          font-family:'Orbitron',monospace;font-size:13px;font-weight:700;
+          letter-spacing:3px;cursor:pointer;box-shadow:0 4px 20px var(--blue-glow)">
+          MARK COMPLETE
+        </button>
+      ` : `
+        <div style="text-align:center;padding:12px;color:var(--green);font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:2px">
+          ✓ QUEST COMPLETED — XP EARNED
+        </div>
+      `}
+    </div>
+  `;
+
+  modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+  document.body.appendChild(modal);
+}
+
+function renderSkills() {
+  const grid = document.getElementById('skillGrid');
+  const skills = [
+    { key: 'fitness', name: 'The Vessel', icon: '⚔️', desc: 'Body & Fuel', quests: ['Gym', 'Agility', 'Nutrition', 'Hydration', 'Hygiene'] },
+    { key: 'work',    name: 'The Empire',    icon: '💼', desc: 'Wealth Generation', quests: ['Outreach', 'Industry Knowledge'] },
+    { key: 'study',   name: 'The Intellect', icon: '🧠', desc: 'Mind Sharpness', quests: ['Chess', 'AI News'] },
+    { key: 'habit',   name: 'The Aura',      icon: '👑', desc: 'Discipline & Command', quests: ['Meditation', 'Posture', 'Detox', 'Journal'] },
+  ];
+
+  grid.innerHTML = skills.map(s => {
+    const sk = state.skills[s.key];
+    const pct = Math.min((sk.xp / sk.xpToNext) * 100, 100);
+    return `
+      <div class="skill-card">
+        <div class="skill-header">
+          <div class="skill-name">${s.icon} ${s.name}</div>
+          <div class="skill-level">LV.${sk.level}</div>
+        </div>
+        <div style="font-size:9px;color:var(--text-dim);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">${s.desc}</div>
+        <div class="skill-bar">
+          <div class="skill-fill ${s.key}" style="width:${pct}%"></div>
+        </div>
+        <div class="skill-xp">${sk.xp} / ${sk.xpToNext} XP</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderAnalytics() {
+  document.getElementById('statTotalXP').textContent = state.totalXP;
+  document.getElementById('statStreak').textContent = state.streak + '🔥';
+  document.getElementById('statQuests').textContent = state.questsDone;
+
+  // Heatmap — last 28 days
+  const hm = document.getElementById('heatmap');
+  const days = [];
+  for (let i = 27; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+    const status = state.heatmap[key] || 'empty';
+    const isToday = i === 0;
+    days.push(`<div class="streak-day ${status} ${isToday ? 'today' : ''}">${d.getDate()}</div>`);
+  }
+  hm.innerHTML = days.join('');
+
+  // Log
+  const log = document.getElementById('activityLog');
+  const logs = (state.activityLog || []).slice().reverse().slice(0, 10);
+  document.getElementById('logCount').textContent = state.activityLog.length;
+  log.innerHTML = logs.map(l => `
+    <div class="notif-item">
+      <div class="notif-dot" style="background:${l.color}"></div>
+      <div class="notif-msg">${l.msg}</div>
+      <div class="notif-time">${l.time}</div>
+    </div>
+  `).join('') || '<div class="notif-item"><div class="notif-msg" style="color:var(--text-dim)">No activity yet.</div></div>';
+
+  // Skill log
+  const sl = document.getElementById('skillLog');
+  const skillLogs = (state.activityLog || []).filter(l => l.type === 'skill').slice().reverse().slice(0, 5);
+  sl.innerHTML = skillLogs.map(l => `
+    <div class="notif-item">
+      <div class="notif-dot" style="background:${l.color}"></div>
+      <div class="notif-msg">${l.msg}</div>
+      <div class="notif-time">${l.time}</div>
+    </div>
+  `).join('') || '<div class="notif-item"><div class="notif-msg" style="color:var(--text-dim)">Complete quests to earn skill XP.</div></div>';
+}
+
+function renderSettings() {
+  document.getElementById('settingName').textContent = state.name;
+  document.getElementById('settingRank').textContent = getRank(state.level);
+  document.getElementById('settingLevel').textContent = state.level;
+
+  // Webhook URL for n8n to POST to
+  const appUrl = window.location.href.split('?')[0];
+  document.getElementById('appWebhookUrl').textContent = state.webhook
+    ? `Connected to: ${state.webhook.substring(0, 50)}...`
+    : 'No n8n webhook configured';
+
+  Object.keys(state.settings || {}).forEach(k => {
+    const el = document.getElementById(`toggle-${k}`);
+    if (el) el.className = `toggle ${state.settings[k] ? 'on' : ''}`;
+  });
+}
+
+// ═══════════════════════════════════════════
+//  GAME LOGIC
+// ═══════════════════════════════════════════
+
+function completeQuest(id) {
+  const quest = state.dailyQuests.find(q => q.id === id);
+  if (!quest || quest.completed) return;
+
+  quest.completed = true;
+  gainXP(quest.xp, quest.area);
+  state.questsDone++;
+
+  const today = getTodayKey();
+  const done = state.dailyQuests.filter(q => q.completed).length;
+  const total = state.dailyQuests.length; // 13
+
+  if (done === total) {
+    state.heatmap[today] = 'done';
+    addLog('ALL 13 quests completed! Perfect day. The Sovereign is pleased.', 'var(--gold)', 'achievement');
+    triggerAIMessage('all_complete');
+    sendPushNotification('👑 Perfect Day!', 'All 13 quests complete. The Sovereign acknowledges your discipline.');
+  } else if (done >= Math.ceil(total * 0.5)) {
+    state.heatmap[today] = 'partial';
+  }
+
+  showXPPopup(quest.xp);
+  spawnParticles();
+  saveState();
+  renderAll();
+}
+
+function gainXP(amount, area) {
+  state.xp += amount;
+  state.totalXP += amount;
+
+  // Skill XP
+  if (area && state.skills[area]) {
+    const sk = state.skills[area];
+    sk.xp += amount;
+    if (sk.xp >= sk.xpToNext) {
+      sk.xp -= sk.xpToNext;
+      sk.level++;
+      sk.xpToNext = Math.floor(sk.xpToNext * 1.4);
+      addLog(`${area.toUpperCase()} skill advanced to Level ${sk.level}!`, 'var(--purple)', 'skill');
+      if (state.settings.skillup) triggerAIMessage('skill_up', { skill: area, level: sk.level });
+    }
+  }
+
+  // Level up
+  let leveled = false;
+  while (state.xp >= state.xpToNext) {
+    state.xp -= state.xpToNext;
+    state.level++;
+    state.xpToNext = getXPToNext(state.level);
+    leveled = true;
+    const newRank = getRank(state.level);
+    if (newRank !== state.rank) {
+      state.rank = newRank;
+      addLog(`RANK ADVANCEMENT: Rank ${newRank} achieved!`, 'var(--gold)', 'rank');
+    }
+  }
+
+  if (leveled) showLevelUp();
+}
+
+function completeBoss() {
+  if (state.bossCompleted) return;
+  const boss = BOSSES[state.bossIndex % BOSSES.length];
+  state.bossCompleted = true;
+  state.bossIndex++;
+  gainXP(boss.xp, null);
+  addLog(`BOSS CLEARED: ${boss.name}. +${boss.xp} XP gained!`, 'var(--gold)', 'boss');
+  spawnParticles();
+  showXPPopup(boss.xp);
+  saveState();
+  renderAll();
+}
+
+function attemptBoss() {
+  if (state.bossCompleted) {
+    setAlert('🏆', 'BOSS CLEARED', 'You have already defeated this week\'s boss. A new challenger arrives next Monday.');
+  }
+}
+
+// ═══════════════════════════════════════════
+//  AI TRIGGER SYSTEM
+// ═══════════════════════════════════════════
+
+function getRandomMsg(arr, replacements = {}) {
+  let msg = arr[Math.floor(Math.random() * arr.length)];
+  Object.keys(replacements).forEach(k => { msg = msg.replace(new RegExp(`{${k}}`, 'g'), replacements[k]); });
+  return msg;
+}
+
+function triggerAIMessage(type, data = {}) {
+  let icon = '⚡', alertType = 'AI TRIGGER — SYSTEM MESSAGE', msg = '';
+
+  switch (type) {
+    case 'morning':
+      if (!state.settings?.morning) return;
+      icon = '🌅'; alertType = 'DAILY QUEST ASSIGNMENT';
+      msg = getRandomMsg(AI_MESSAGES.morning);
+      addLog('AI triggered: Morning quest assignment.', 'var(--cyan)');
+      break;
+    case 'streak_warning':
+      if (!state.settings?.streak) return;
+      icon = '⚠️'; alertType = 'STREAK WARNING — URGENT';
+      msg = getRandomMsg(AI_MESSAGES.streak_warning, { days: state.streak });
+      addLog('AI triggered: Streak warning sent.', 'var(--red)');
+      break;
+    case 'skill_up':
+      if (!state.settings?.skillup) return;
+      icon = '⬆️'; alertType = 'SKILL ADVANCEMENT DETECTED';
+      msg = getRandomMsg(AI_MESSAGES.skill_up, data);
+      break;
+    case 'levelup':
+      icon = '🌟'; alertType = 'LEVEL UP — SYSTEM EVENT';
+      msg = getRandomMsg(AI_MESSAGES.levelup, { level: state.level });
+      break;
+    case 'all_complete':
+      icon = '👑'; alertType = 'PERFECT DAY — ALL 13 QUESTS COMPLETE';
+      msg = 'Exceptional. All 4 pillars conquered today. The Vessel trained. The Empire built. The Mind sharpened. The Aura held. Log it in your Book of Shadows tonight.';
+      break;
+    case 'boss_spawn':
+      if (!state.settings?.boss) return;
+      icon = '🐉'; alertType = 'BOSS RAID — GATE OPENED';
+      msg = getRandomMsg(AI_MESSAGES.boss_spawn);
+      addLog('AI triggered: Boss raid spawned.', 'var(--red)');
+      break;
+    case 'idle':
+      icon = '😴'; alertType = 'INACTIVITY DETECTED';
+      msg = getRandomMsg(AI_MESSAGES.idle);
+      addLog('AI triggered: Idle warning.', 'var(--text-dim)');
+      break;
+    default:
+      msg = data.message || 'System update.';
+  }
+
+  setAlert(icon, alertType, msg);
+
+  // If webhook connected, notify n8n too
+  if (state.webhook) {
+    notifyN8n({ type, data, level: state.level, streak: state.streak, questsDone: state.questsDone });
+  }
+}
+
+function setAlert(icon, type, text) {
+  document.getElementById('alertIcon').textContent = icon;
+  document.getElementById('alertType').textContent = type;
+  document.getElementById('alertText').textContent = text;
+  const alert = document.getElementById('aiAlert');
+  alert.style.display = 'flex';
+  alert.style.animation = 'none';
+  setTimeout(() => alert.style.animation = 'alert-appear 0.5s ease-out', 10);
+}
+
+function dismissAlert() {
+  document.getElementById('aiAlert').style.display = 'none';
+}
+
+function notifyN8n(payload) {
+  if (!state.webhook) return;
+  fetch(state.webhook, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ...payload, hunter: state.name, timestamp: new Date().toISOString() })
+  }).catch(() => {});
+}
+
+// Webhook receiver — n8n posts back to this page
+function handleIncomingWebhook(data) {
+  if (!data || !data.type) return;
+  switch (data.type) {
+    case 'quest':
+      if (data.quests && Array.isArray(data.quests)) {
+        state.dailyQuests = data.quests.map((q, i) => ({ ...q, id: i, completed: false }));
+        addLog('AI generated new custom quests via n8n.', 'var(--cyan)');
+        renderQuests();
+      }
+      break;
+    case 'streak_warning':
+      triggerAIMessage('streak_warning');
+      break;
+    case 'levelup':
+      triggerAIMessage('levelup', data);
+      break;
+    case 'boss':
+      BOSSES.unshift({ name: data.name, xp: data.xp || 500, desc: data.desc || '', icon: data.icon || '🐉' });
+      state.bossCompleted = false;
+      triggerAIMessage('boss_spawn');
+      renderQuests();
+      break;
+    case 'message':
+      setAlert(data.icon || '💬', data.alertType || 'SYSTEM MESSAGE', data.message);
+      break;
+  }
+  saveState();
+}
+
+// ═══════════════════════════════════════════
+//  AI SCHEDULER (proactive, no user input)
+// ═══════════════════════════════════════════
+
+function startAIScheduler() {
+  // Check every minute
+  setInterval(checkScheduledTriggers, 60 * 1000);
+  checkScheduledTriggers(); // also check immediately
+
+  // Poll n8n webhook for incoming messages every 2 minutes
+  if (state.webhook) {
+    setInterval(pollN8nForTriggers, 120 * 1000);
+  }
+}
+
+function checkScheduledTriggers() {
+  const now = new Date();
+  const h = now.getHours(), m = now.getMinutes();
+  const today = getTodayKey();
+
+  // Morning trigger at 6:00 AM
+  if (h === 6 && m < 2 && state.settings?.morning) {
+    const lastMorning = localStorage.getItem('arise_last_morning');
+    if (lastMorning !== today) {
+      localStorage.setItem('arise_last_morning', today);
+      triggerAIMessage('morning');
+      sendPushNotification('🌅 Daily Quests Ready', 'Your quests have been assigned. Rise, Hunter.');
+    }
+  }
+
+  // Streak warning at 10:00 PM (22:00)
+  if (h === 22 && m < 2 && state.settings?.streak) {
+    const lastWarn = localStorage.getItem('arise_last_streak_warn');
+    if (lastWarn !== today) {
+      const completed = state.dailyQuests.filter(q => q.completed).length;
+      if (completed < state.dailyQuests.length) {
+        localStorage.setItem('arise_last_streak_warn', today);
+        triggerAIMessage('streak_warning');
+        sendPushNotification('⚠️ Streak Warning', `${state.dailyQuests.length - completed} quests remaining. 2 hours left!`);
+      }
+    }
+  }
+
+  // Monday boss spawn at 8:00 AM
+  if (now.getDay() === 1 && h === 8 && m < 2 && state.settings?.boss) {
+    const lastBoss = localStorage.getItem('arise_last_boss');
+    const weekKey = `${now.getFullYear()}-${now.getWeek ? now.getWeek() : Math.floor(now.getDate() / 7)}`;
+    if (lastBoss !== weekKey) {
+      localStorage.setItem('arise_last_boss', weekKey);
+      state.bossCompleted = false;
+      triggerAIMessage('boss_spawn');
+      sendPushNotification('🐉 Boss Raid Active', 'A new gate has opened. Face the boss this week.');
+    }
+  }
+
+  // Idle detection — 2 days no activity
+  if (state.lastActiveDay) {
+    const last = new Date(state.lastActiveDay);
+    const diffDays = Math.floor((now - last) / (1000 * 60 * 60 * 24));
+    if (diffDays >= 2) {
+      const lastIdle = localStorage.getItem('arise_last_idle');
+      if (lastIdle !== today) {
+        localStorage.setItem('arise_last_idle', today);
+        triggerAIMessage('idle');
+        sendPushNotification('😴 Inactivity Detected', 'The System has noticed your absence. Return, Hunter.');
+      }
+    }
+  }
+
+  // Update last active
+  state.lastActiveDay = now.toISOString();
+  saveState();
+}
+
+function pollN8nForTriggers() {
+  // This polls your n8n webhook for any queued triggers
+  if (!state.webhook) return;
+  const pollUrl = state.webhook.replace('/webhook/', '/webhook-test/') + '/poll';
+  fetch(state.webhook + '?action=poll&hunter=' + encodeURIComponent(state.name))
+    .then(r => r.json())
+    .then(data => { if (data && data.type) handleIncomingWebhook(data); })
+    .catch(() => {});
+}
+
+// ═══════════════════════════════════════════
+//  PUSH NOTIFICATIONS
+// ═══════════════════════════════════════════
+
+async function registerPushNotifications() {
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'default') {
+    await Notification.requestPermission();
+  }
+}
+
+function sendPushNotification(title, body) {
+  if (Notification.permission === 'granted') {
+    try {
+      new Notification(title, {
+        body,
+        icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">⚔️</text></svg>',
+        badge: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">⚡</text></svg>',
+        tag: 'arise-system',
+        requireInteraction: false
+      });
+    } catch(e) {}
+  }
+}
+
+// ═══════════════════════════════════════════
+//  UI ACTIONS
+// ═══════════════════════════════════════════
+
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`panel-${tab}`).classList.add('active');
+  btn.classList.add('active');
+  renderAll();
+}
+
+function showLevelUp() {
+  const ol = document.getElementById('levelupOverlay');
+  document.getElementById('levelupNum').textContent = state.level;
+  document.getElementById('levelupText').textContent = `Level ${state.level} Achieved`;
+  document.getElementById('levelupMsg').textContent = getRandomMsg(AI_MESSAGES.levelup, { level: state.level });
+  ol.classList.add('active');
+  spawnParticles(20);
+  sendPushNotification('🌟 Level Up!', `You have reached Level ${state.level}. The System acknowledges your growth.`);
+  addLog(`LEVEL UP — Level ${state.level} achieved!`, 'var(--gold)', 'levelup');
+}
+
+function closeLevelUp() {
+  document.getElementById('levelupOverlay').classList.remove('active');
+}
+
+function showXPPopup(xp) {
+  const el = document.createElement('div');
+  el.className = 'xp-popup';
+  el.textContent = `+${xp} XP`;
+  el.style.left = `${30 + Math.random() * 40}%`;
+  el.style.top = `${40 + Math.random() * 20}%`;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1200);
+}
+
+function spawnParticles(count = 8) {
+  const emojis = ['✨', '⚡', '🌟', '💎', '🔥', '⚔️'];
+  for (let i = 0; i < count; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'particle';
+      el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      el.style.left = `${20 + Math.random() * 60}%`;
+      el.style.top = `${30 + Math.random() * 40}%`;
+      el.style.animationDelay = `${Math.random() * 0.3}s`;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 1500);
+    }, i * 60);
+  }
+}
+
+function addLog(msg, color = 'var(--text-dim)', type = 'system') {
+  const now = new Date();
+  const time = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+  if (!state.activityLog) state.activityLog = [];
+  state.activityLog.push({ msg, color, time, type });
+  if (state.activityLog.length > 50) state.activityLog.shift();
+}
+
+function toggleSetting(key) {
+  if (!state.settings) state.settings = {};
+  state.settings[key] = !state.settings[key];
+  saveState();
+  renderSettings();
+}
+
+function copyWebhook() {
+  const url = document.getElementById('appWebhookUrl').textContent;
+  navigator.clipboard.writeText(url).then(() => {
+    const btn = event.target;
+    btn.textContent = 'COPIED!';
+    setTimeout(() => btn.textContent = 'COPY URL', 2000);
+  });
+}
+
+function resetSystem() {
+  const existing = document.getElementById('resetModal');
+  if (existing) existing.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'resetModal';
+  modal.style.cssText = `
+    position:fixed;inset:0;z-index:500;background:rgba(5,5,16,0.95);
+    backdrop-filter:blur(10px);display:flex;align-items:center;
+    justify-content:center;padding:30px;
+  `;
+  modal.innerHTML = `
+    <div style="background:var(--surface);border:1px solid rgba(255,51,102,0.4);border-radius:16px;
+      padding:28px 24px;width:100%;max-width:320px;text-align:center">
+      <div style="font-size:36px;margin-bottom:12px">⚠️</div>
+      <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:var(--red);
+        letter-spacing:2px;margin-bottom:10px">RESET SYSTEM</div>
+      <div style="font-size:13px;color:var(--text);line-height:1.6;margin-bottom:24px">
+        This will erase all progress — level, XP, quests, streaks, and logs.<br><br>
+        <span style="color:var(--red)">This cannot be undone.</span>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button onclick="document.getElementById('resetModal').remove()"
+          style="flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);
+          font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1px;
+          padding:13px;border-radius:8px;cursor:pointer;text-transform:uppercase">
+          CANCEL
+        </button>
+        <button onclick="localStorage.clear();location.reload()"
+          style="flex:1;background:rgba(255,51,102,0.1);border:1px solid rgba(255,51,102,0.5);
+          color:var(--red);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1px;
+          padding:13px;border-radius:8px;cursor:pointer;text-transform:uppercase">
+          CONFIRM RESET
+        </button>
+      </div>
+    </div>
+  `;
+  modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+  document.body.appendChild(modal);
+}
+
+function downloadWorkflow() {
+  const workflow = generateN8nWorkflow();
+  const blob = new Blob([JSON.stringify(workflow, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'ARISE-n8n-workflow.json';
+  a.click();
+}
+
+// ═══════════════════════════════════════════
+//  N8N WORKFLOW GENERATOR
+// ═══════════════════════════════════════════
+
+function generateN8nWorkflow() {
+  const appUrl = window.location.href;
+  const webhook = state.webhook || 'YOUR_N8N_WEBHOOK_URL';
+
+  return {
+    "name": "ARISE — Solo Leveling AI Trigger System",
+    "nodes": [
+      {
+        "parameters": { "rule": { "interval": [{ "field": "cronExpression", "expression": "0 6 * * *" }] } },
+        "name": "Morning Trigger (6AM Daily)",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "position": [240, 300]
+      },
+      {
+        "parameters": { "rule": { "interval": [{ "field": "cronExpression", "expression": "0 22 * * *" }] } },
+        "name": "Streak Warning (10PM Daily)",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "position": [240, 500]
+      },
+      {
+        "parameters": { "rule": { "interval": [{ "field": "cronExpression", "expression": "0 8 * * 1" }] } },
+        "name": "Boss Spawn (Monday 8AM)",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "position": [240, 700]
+      },
+      {
+        "parameters": {
+          "authentication": "none",
+          "requestMethod": "POST",
+          "url": appUrl,
+          "jsonParameters": true,
+          "bodyParametersJson": JSON.stringify({
+            "type": "morning_trigger",
+            "message": "Your daily quests have been assigned. Rise, Hunter. The System watches.",
+            "icon": "🌅",
+            "alertType": "DAILY QUEST ASSIGNMENT"
+          })
+        },
+        "name": "Send Morning Quest",
+        "type": "n8n-nodes-base.httpRequest",
+        "position": [500, 300]
+      },
+      {
+        "parameters": {
+          "authentication": "none",
+          "requestMethod": "POST",
+          "url": appUrl,
+          "jsonParameters": true,
+          "bodyParametersJson": JSON.stringify({
+            "type": "streak_warning",
+            "message": "Warning, Hunter. The night approaches. Your streak is at risk. Complete your remaining quests.",
+            "icon": "⚠️"
+          })
+        },
+        "name": "Send Streak Warning",
+        "type": "n8n-nodes-base.httpRequest",
+        "position": [500, 500]
+      },
+      {
+        "parameters": {
+          "authentication": "none",
+          "requestMethod": "POST",
+          "url": appUrl,
+          "jsonParameters": true,
+          "bodyParametersJson": JSON.stringify({
+            "type": "boss",
+            "name": "Weekly Iron Gate",
+            "xp": 600,
+            "icon": "🐉",
+            "desc": "Prove your worth this week. The gate will close on Sunday."
+          })
+        },
+        "name": "Spawn Weekly Boss",
+        "type": "n8n-nodes-base.httpRequest",
+        "position": [500, 700]
+      },
+      {
+        "parameters": {
+          "path": "arise-trigger",
+          "responseMode": "lastNode",
+          "options": {}
+        },
+        "name": "Webhook — Receive from App",
+        "type": "n8n-nodes-base.webhook",
+        "position": [240, 900]
+      },
+      {
+        "parameters": {
+          "jsCode": `
+// This node processes incoming data from the ARISE app
+// and can trigger AI analysis via OpenAI
+const data = $input.first().json;
+const type = data.type;
+const level = data.level || 1;
+const streak = data.streak || 0;
+
+// Add your OpenAI API key to generate personalized messages
+let response = { type: 'message', message: 'The System acknowledges your report.', icon: '⚡' };
+
+if (type === 'quest_complete') {
+  response.message = \`Outstanding discipline, Hunter. Level \${level} is within reach. Keep pushing.\`;
+  response.icon = '🏆';
+  response.alertType = 'QUEST CONFIRMED';
+}
+
+return [{ json: response }];
+          `
+        },
+        "name": "AI Response Engine (Add OpenAI here)",
+        "type": "n8n-nodes-base.code",
+        "position": [500, 900]
+      }
+    ],
+    "connections": {
+      "Morning Trigger (6AM Daily)": { "main": [[{ "node": "Send Morning Quest", "type": "main", "index": 0 }]] },
+      "Streak Warning (10PM Daily)": { "main": [[{ "node": "Send Streak Warning", "type": "main", "index": 0 }]] },
+      "Boss Spawn (Monday 8AM)": { "main": [[{ "node": "Spawn Weekly Boss", "type": "main", "index": 0 }]] },
+      "Webhook — Receive from App": { "main": [[{ "node": "AI Response Engine (Add OpenAI here)", "type": "main", "index": 0 }]] }
+    },
+    "settings": { "executionOrder": "v1" },
+    "_arise_instructions": {
+      "step1": "Import this JSON into n8n via Workflows → Import",
+      "step2": "Replace 'YOUR_APP_URL' in HTTP Request nodes with your ARISE app URL",
+      "step3": "Add your OpenAI API key in the Code node for personalized AI messages",
+      "step4": "Activate all workflows",
+      "step5": "The system will now proactively trigger your app without any user input"
+    }
+  };
+}
+
+// ═══════════════════════════════════════════
+//  PWA SERVICE WORKER
+// ═══════════════════════════════════════════
+
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    self.addEventListener('install', e => self.skipWaiting());
+    self.addEventListener('activate', e => clients.claim());
+    self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => new Response('Offline'))));
+    self.addEventListener('push', e => {
+      const data = e.data ? e.data.json() : { title: 'ARISE', body: 'System Update' };
+      e.waitUntil(self.registration.showNotification(data.title, {
+        body: data.body,
+        icon: data.icon || '/icon.png',
+        badge: '/badge.png',
+        tag: 'arise',
+        requireInteraction: true
+      }));
+    });
+  `;
+  const blob = new Blob([swCode], { type: 'application/javascript' });
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).catch(() => {});
+}
+</script>
+</body>
+</html>
